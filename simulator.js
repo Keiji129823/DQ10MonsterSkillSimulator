@@ -404,8 +404,15 @@
 
   function showLoadError(error){
     console.error("スキルデータを読み込めませんでした。",error);
-    var message=el("p","panel empty","スキルデータを読み込めませんでした。SkillName.json と skills-master.json がHTMLと同じフォルダーにあるか確認してください。");
+    var message=el("div","panel empty");
     message.setAttribute("role","alert");
+    if(location.protocol==="file:"){
+      message.appendChild(el("p",null,"このHTMLを直接開いているため、ブラウザーの制限でスキルデータを読み込めません。"));
+      message.appendChild(el("p",null,"HTMLとJSONファイルを同じフォルダーに置いたまま、ローカルWebサーバー経由で開いてください。Windowsでは、そのフォルダーで「py -m http.server 8000」を実行し、表示されたサーバーのページからこのHTMLを開きます。"));
+    }else{
+      message.appendChild(el("p",null,"スキルデータを読み込めませんでした。SkillName.json と skills-master.json がHTMLと同じフォルダーにあるか確認してください。"));
+      message.appendChild(el("p",null,"詳細: "+(error&&error.message?error.message:String(error))));
+    }
     $("#cards").replaceChildren(message);
     $("#empty").style.display="none";
   }
