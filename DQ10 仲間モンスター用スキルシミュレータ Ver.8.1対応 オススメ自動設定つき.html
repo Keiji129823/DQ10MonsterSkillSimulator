@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DQ10 仲間モンスター用スキルシミュレータ Ver.8.1対応 オススメ自動設定つき</title>
+<style>
+:root{
+  --c-bg:#fff; --c-text:#222; --c-muted:#888; --c-title:#0000ff; --c-link:#0000ee;
+  --c-guide:#008000; --c-notice:#ff4040; --c-panel:#7a8a9a; --c-rule:#e8c8c8;
+  --c-btn:#efeeea; --c-btn-b:#aaa; --c-hair:#c9c9c9; --c-active:#b00020;
+  --fs:14px; --sp-xs:2px; --sp-sm:4px; --sp-md:10px; --sp-lg:12px;
+  --side:176px; --pal-w:100px; --skill-w:210px; --left-w:136px;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --c-bg:#16181b; --c-text:#e6e6e6; --c-muted:#8a8f96; --c-title:#8ab4ff; --c-link:#8ab4ff;
+    --c-guide:#5fd068; --c-notice:#ff7b7b; --c-panel:#5d6b7a; --c-rule:#5a3f3f;
+    --c-btn:#2a2d31; --c-btn-b:#555; --c-hair:#3a3d41; --c-active:#ff9aa8; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--c-bg);color:var(--c-text);font:var(--fs)/1.5 "Meiryo","Yu Gothic UI","Hiragino Sans","Noto Sans JP",sans-serif}
+a{color:var(--c-link)}
+button,select,input{font:inherit;color:inherit}
+button,select,input{background:var(--c-btn);border:1px solid var(--c-btn-b);border-radius:4px}
+button{cursor:pointer;padding:0 6px}
+button:hover{filter:brightness(.95)}
+:focus-visible{outline:3px solid #3b82f6;outline-offset:1px}
+
+/* header */
+header{border-bottom:3px solid var(--c-rule);padding:var(--sp-md) var(--sp-lg) var(--sp-sm)}
+.h-top{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-md)}
+h1{margin:0;font-size:19px;line-height:1.3;color:var(--c-title)}
+.url{display:flex;align-items:center;gap:var(--sp-xs);font-size:13px;flex:0 1 460px;min-width:0}
+.url label{white-space:nowrap}
+.url input{flex:1;min-width:0;height:24px;padding:0 4px;background:var(--c-bg);font-size:12px}
+.url button{height:24px;font-size:12px;white-space:nowrap}
+.nav{display:flex;gap:var(--sp-md);margin-top:var(--sp-sm);flex-wrap:wrap;align-items:flex-start}
+.ctl{display:flex;flex-direction:column;gap:var(--sp-xs)}
+.ctl button{width:112px;height:22px;text-align:left;white-space:nowrap;font-size:12px}
+.grp{display:grid;grid-template-columns:repeat(5,var(--pal-w));gap:var(--sp-xs)}
+.grp button{height:22px;text-align:left;padding:0 4px;overflow:hidden;white-space:nowrap;font-size:12px}
+
+/* layout */
+.wrap{display:flex;gap:var(--sp-md);padding:var(--sp-md);align-items:flex-start}
+main{flex:1;min-width:0}
+aside{width:var(--side);flex:none;align-self:stretch}
+.ad{position:sticky;top:12px;width:160px;height:600px;margin:0 auto;border:1px dashed var(--c-hair);display:flex;align-items:center;justify-content:center;color:var(--c-muted);font-size:12px}
+.panel{border:2px solid var(--c-panel);border-radius:5px;margin-bottom:var(--sp-sm);background:var(--c-bg)}
+
+/* empty / bulk */
+.empty{min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:var(--sp-md)}
+.empty .g{color:var(--c-guide);font-size:16px}
+.empty .n{color:var(--c-notice);font-size:16px}
+.bulk{padding:4px 12px;display:flex;align-items:center;gap:6px}
+.bulk select{height:24px}
+.bulk button{height:26px}
+
+/* card */
+.card-h{display:flex;align-items:center;gap:8px;padding:4px 8px;flex-wrap:wrap}
+.card-h .ttl{font-size:18px;font-weight:700;margin-right:auto;white-space:nowrap}
+.card-h .ttl small{font-size:13px;font-weight:400}
+.card-h label{white-space:nowrap;font-size:13px}
+.card-h select,.card-h input{height:24px;font-size:13px}
+.card-h select{max-width:110px}
+.card-h .nm{width:110px;padding:0 4px;background:var(--c-bg)}
+.ib{width:24px;height:24px;padding:0;text-align:center;line-height:1;font-size:12px}
+.body{display:flex;padding:0 8px 4px;gap:0}
+.left{width:var(--left-w);flex:none;padding:2px 8px 4px 0;border-right:1px solid var(--c-hair);text-align:center;font-size:13px;line-height:1.45}
+.left select{height:24px;font-size:13px}
+.left .sp{font-size:18px;font-weight:700}
+.left .sp small{font-size:13px}
+.left input[type=number]{width:52px;height:24px;text-align:right;font-size:13px}
+.rec{display:block;width:100%;height:38px;margin-top:12px;border:0;border-radius:6px;background:linear-gradient(#ff9a1f,#ff6a00);color:#fff;font-weight:700;font-size:15px;box-shadow:0 2px 0 #b84800;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.rec:hover{filter:brightness(1.08)}
+.rec:active{transform:translateY(1px);box-shadow:0 1px 0 #b84800}
+.skills{display:flex;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0}
+.line{flex:1 1 0;min-width:168px;padding:2px 6px}
+.line.ph{color:var(--c-muted);text-align:center;background:var(--c-btn);border-radius:4px;opacity:.75}
+.line.ph h3{color:var(--c-muted)}
+.line.ph p{font-size:12px;margin:10px 4px}
+.line h3{margin:0;text-align:center;font-size:15px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line .st{display:flex;justify-content:center;gap:4px;margin:2px 0}
+.line input{width:56px;height:24px;text-align:right;font-size:13px}
+.line .rs{width:28px;height:24px;padding:0;font-size:13px}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{display:flex;gap:6px;height:21px;line-height:21px;color:var(--c-muted);cursor:pointer;white-space:nowrap;overflow:hidden;font-size:12.5px}
+.rows li span{overflow:hidden;text-overflow:ellipsis}
+.rows li:hover{background:var(--c-btn)}
+.rows li b{width:20px;text-align:right;font-weight:400;flex:none}
+.rows li.on{color:var(--c-text);font-weight:700}
+.rows li.on b{color:var(--c-active)}
+.card.fold .rows,.card.fold .rec{display:none}
+.card.fold .line{padding-bottom:0}
+
+/* description */
+.desc{font-size:13px;line-height:1.6;margin-top:var(--sp-md)}
+.desc ul{margin:2px 0;padding-left:1.6em}
+
+@media (max-width:1000px){
+  :root{--fs:14px}
+  .h-top{flex-wrap:wrap}
+  .url{flex-basis:100%}
+  .wrap{flex-direction:column}
+  aside{display:none}
+  .body{flex-direction:column}
+  .left{width:100%;border-right:0;border-bottom:1px solid var(--c-hair);padding-bottom:6px}
+  .skills{flex-wrap:wrap;overflow-x:visible}
+  .line{flex:1 1 100%}
+  .card-h .nm{width:100px}
+  .grp{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));width:100%}
+  .ctl{flex-direction:row;width:100%}
+  .ctl button{width:auto;flex:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-top">
+    <h1>DQ10 仲間モンスター用スキルシミュレータ Ver.8.1対応 オススメ自動設定つき</h1>
+    <div class="url"><label for="u">保存用URL:</label><input id="u" readonly><button type="button">保存用URLをツイート</button></div>
+  </div>
+  <div class="nav">
+    <div class="ctl"><button id="foldAll" type="button">▲すべてたたむ</button><button id="openAll" type="button">▼すべてひろげる</button></div>
+    <div class="grp" id="g1"></div>
+    <div class="grp" id="g2"></div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <div id="cards"></div>
+  <div class="panel empty" id="empty">
+    <div class="g">上のモンスター名のボタンをクリックして仲間モンスターを追加してください。</div>
+    <div class="n">（転生回数は最大15回です）</div>
+  </div>
+  <div class="panel bulk"><label for="bl">レベル一括設定</label><select id="bl"></select><button id="bs" type="button">設定</button></div>
+  <div class="desc">
+    <ul>
+      <li>これはデザイン確認用のプロトタイプです。スキル名・ポイントはダミーデータです。「オススメ設定」も仮のロジックで、手持ちのポイントを各スキルに均等寄りに割り振ります。</li>
+      <li>使い方:
+        <ul>
+          <li>ページ上部のモンスター名のボタンをクリックすると、仲間モンスターの欄がひとつ増えます。</li>
+          <li>各欄右上の×で削除、▼と▲で並べ替え、「たたむ」で簡易表示になります。</li>
+          <li>スキル一覧の項目をクリックすると必要なポイントが自動入力されます。↑↓キーで±1、PageUp/PageDownキーで±10、直接入力も可能です。</li>
+          <li>転生回数を1以上にすると、追加スキル1・2を選択でき、スキル欄の4列目・5列目に表示されます。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</main>
+<aside><div class="ad" aria-label="広告枠">広告枠 160×600</div></aside>
+</div>
+
+<script>
+(function(){
+  var G1="スライム,モーモン,プリズニャン,ホイミスライム,スライムナイト,キメラ,ねこまどう,リザードマン,バトルレックス,いたずらもぐら,ベビーサタン,ドラゴンキッズ,ドラキー,ブラウニー,キラーパンサー".split(",");
+  var G2="メタッピー,たけやりへい,ニードルマン,フォンデュ,エンタシスマン,さまようよろい,ゴーレム,デビルアーマー,おどるほうせき,マジカルハット,パペットマン,キラーマシン,やみしばり,たんすミミック,ミステリドール".split(",");
+  var TH=[3,7,12,18,25,32,40,43,48,50];
+  var SLIME=[
+    ["スラッププラーⅡ",["スラ・ストライク","常時かいしん率+10%","スラ・フラッシュ","常時さいだいＨＰ+30","ミラクルストライク","常時すばやさ+100","キングスタンプ","スラ・フラッシュ+50","プルプルボディ","キングスタンプ+200"]],
+    ["スラフォースⅡ",["ピオリム","常時すばやさ+40","ザオ","常時さいだいＭＰ+50","ベホイミ","常時かいふく魔力+100","バイキルト","行動時10%ピオラ","スライムハート","行動時10%バイシオン"]],
+    ["ブーメラン",["装備時こうげき力+10","スライムブロウ","装備時こうげき力+15","パワフルスロー","装備時命中+20%","装備時こうげき力+25","バーニングバード"]]
+  ];
+  var EXTRA=["追加スキルA","追加スキルB","追加スキルC","追加スキルD"];
+  var cards=[],uid=0;
+  var $=function(s){return document.querySelector(s)};
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+
+  function lines(name){
+    if(name==="スライム")return SLIME;
+    return ["A","B","C"].map(function(k){
+      return [name+"スキル"+k,TH.map(function(p,i){return "技"+k+"-"+(i+1)+"（ダミー）"})];
+    });
+  }
+  function baseSp(lv){return Math.round(lv*1.38)}
+  function sum(a){return a.reduce(function(x,y){return x+y},0)}
+  function getLine(c,k){
+    if(k<3)return c.lines[k];
+    var e=c.extra[k-3];
+    return e?[e,TH.slice(0,8).map(function(p,i){return e+"-"+(i+1)+"（ダミー）"})]:null;
+  }
+  function recommend(c){
+    var bo=bonus(c),left=baseSp(c.level)+bo.b1+bo.b2,p=[0,0,0,0,0],go=true;
+    while(go){go=false;[0,1,2,3,4].forEach(function(k){
+      var L=getLine(c,k);if(!L)return;
+      var nx=TH.slice(0,L[1].length).filter(function(t){return t>p[k]})[0];
+      if(nx!=null&&nx-p[k]<=left){left-=nx-p[k];p[k]=nx;go=true}
+    })}
+    c.pts=p;refresh(c);
+  }
+
+  // palette
+  [[G1,"#g1"],[G2,"#g2"]].forEach(function(g){
+    g[0].forEach(function(n){
+      var b=el("button",null,n);b.type="button";
+      b.onclick=function(){add(n)};
+      $(g[1]).appendChild(b);
+    });
+  });
+  // bulk
+  var bl=$("#bl");
+  for(var i=1;i<=50;i++){bl.appendChild(new Option(i,i,i===50,i===50))}
+  $("#bs").onclick=function(){cards.forEach(function(c){c.level=+bl.value});render()};
+  $("#foldAll").onclick=function(){cards.forEach(function(c){c.fold=true});render()};
+  $("#openAll").onclick=function(){cards.forEach(function(c){c.fold=false});render()};
+
+  function add(name){
+    var L=lines(name);
+    cards.push({id:++uid,name:name,title:name,level:50,trans:15,nat:10,extra:["",""],pts:[0,0,0,0,0],fold:false,lines:L});
+    render();
+    var inp=document.querySelector('.card[data-id="'+uid+'"] .nm');
+    if(inp){inp.focus();inp.select()}
+  }
+  function move(i,d){var j=i+d;if(j<0||j>=cards.length)return;var t=cards[i];cards[i]=cards[j];cards[j]=t;render()}
+
+  function bonus(c){return {b1:c.trans*10,b2:c.nat}}
+  function refresh(c){
+    var n=document.querySelector('.card[data-id="'+c.id+'"]');if(!n)return;
+    var bo=bonus(c),base=baseSp(c.level),total=base+bo.b1+bo.b2,used=sum(c.pts);
+    n.querySelector(".ttl").innerHTML=esc(c.title)+" Lv"+c.level+(c.trans?" <small>+ "+c.trans+"</small>":"");
+    n.querySelector(".sp").innerHTML=(total-used)+" / "+base+" <small>"+(bo.b1?"+"+bo.b1+" ":"")+(bo.b2?"+"+bo.b2:"")+"</small>";
+    n.querySelector(".sp").style.color=(total-used)<0?"var(--c-notice)":"";
+    n.querySelectorAll(".line").forEach(function(ln,k){
+      if(ln.classList.contains("ph"))return;
+      ln.querySelector("h3").textContent=getLine(c,k)[0]+": "+c.pts[k];
+      ln.querySelector("input").value=c.pts[k];
+      ln.querySelectorAll("li").forEach(function(li,r){li.classList.toggle("on",TH[r]<=c.pts[k])});
+    });
+    $("#u").value="https://example.invalid/monster?s="+btoa(unescape(encodeURIComponent(cards.map(function(x){return x.name+x.level+"."+x.pts.join("-")}).join("|")))).slice(0,24);
+  }
+  function esc(s){return s.replace(/[&<>"]/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]})}
+
+  function render(){
+    var box=$("#cards");box.innerHTML="";
+    $("#empty").style.display=cards.length?"none":"flex";
+    if(!cards.length)$("#u").value="";
+    cards.forEach(function(c,i){
+      var n=el("div","panel card"+(c.fold?" fold":""));n.dataset.id=c.id;
+      var h=el("div","card-h");
+      h.appendChild(el("span","ttl",""));
+      var nat=el("label",null,'なつき度: <select class="nat"><option value="0">200未満</option><option value="5">200 (+5)</option><option value="10">300 (+10)</option></select>');
+      nat.querySelector("select").value=c.nat;
+      nat.querySelector("select").onchange=function(e){c.nat=+e.target.value;refresh(c)};
+      h.appendChild(nat);
+      [0,1].forEach(function(k){
+        var l=el("label",null,"追加スキル"+(k+1)+': <select><option value=""></option>'+EXTRA.map(function(x){return "<option>"+x+"</option>"}).join("")+"</select>");
+        var s=l.querySelector("select");s.disabled=c.trans<1;s.value=c.extra[k];
+        s.onchange=function(){c.extra[k]=s.value;c.pts[3+k]=0;if(s.value&&c.extra[1-k]===s.value){c.extra[1-k]="";c.pts[4-k]=0}render()};
+        h.appendChild(l);
+      });
+      var nm=el("label",null,'名前: <input class="nm" type="text">');
+      var ni=nm.querySelector("input");ni.value=c.title;
+      ni.oninput=function(){c.title=ni.value;refresh(c)};
+      h.appendChild(nm);
+      [["fold",c.fold?"▼":"⤒","たたむ/ひろげる",function(){c.fold=!c.fold;render()}],
+       ["dn","▼","下へ",function(){move(i,1)}],["up","▲","上へ",function(){move(i,-1)}],
+       ["del","✖","削除",function(){cards.splice(i,1);render()}]].forEach(function(b){
+        var x=el("button","ib",b[1]);x.type="button";x.title=b[2];x.setAttribute("aria-label",b[2]);x.onclick=b[3];h.appendChild(x);
+      });
+      n.appendChild(h);
+
+      var body=el("div","body"),left=el("div","left");
+      var ls=el("div",null,'<label>レベル <select class="lv"></select></label>');
+      var sel=ls.querySelector("select");
+      for(var lv=1;lv<=50;lv++){sel.appendChild(new Option(lv+" ("+baseSp(lv)+")",lv))}
+      sel.value=c.level;sel.onchange=function(){c.level=+sel.value;refresh(c)};
+      left.appendChild(ls);
+      left.appendChild(el("div",null,"残りスキルポイント:"));
+      left.appendChild(el("div","sp",""));
+      var tr=el("label",null,'転生回数 <input type="number" min="0" max="15">');
+      var ti=tr.querySelector("input");ti.value=c.trans;
+      ti.onchange=function(){c.trans=Math.max(0,Math.min(15,+ti.value||0));if(c.trans<1){c.extra=["",""];c.pts[3]=0;c.pts[4]=0}render()};
+      left.appendChild(tr);
+      var rb=el("button","rec","★ オススメ設定");rb.type="button";rb.title="残りポイントを自動で割り振ります";rb.onclick=function(){recommend(c)};left.appendChild(rb);
+      body.appendChild(left);
+
+      var sk=el("div","skills");
+      [0,1,2,3,4].forEach(function(k){
+        var L=getLine(c,k);
+        if(!L){sk.appendChild(el("div","line ph","<h3>追加スキル"+(k-2)+"</h3><p>"+(c.trans<1?"転生1回以上で選べます":"上の「追加スキル"+(k-2)+"」で選択")+"</p>"));return;}
+        var ln=el("div","line");
+        ln.appendChild(el("h3",null,""));
+        var st=el("div","st");
+        var inp=el("input");inp.type="number";inp.min=0;inp.max=50;inp.setAttribute("aria-label",L[0]+"のポイント");
+        inp.oninput=function(){c.pts[k]=Math.max(0,Math.min(50,+inp.value||0));refresh(c)};
+        inp.onkeydown=function(e){
+          if(e.key==="PageUp"||e.key==="PageDown"){e.preventDefault();c.pts[k]=Math.max(0,Math.min(50,c.pts[k]+(e.key==="PageUp"?10:-10)));refresh(c)}
+        };
+        var rs=el("button","rs","↺");rs.type="button";rs.title="リセット";rs.onclick=function(){c.pts[k]=0;refresh(c)};
+        st.appendChild(inp);st.appendChild(rs);ln.appendChild(st);
+        var ul=el("ul","rows");
+        L[1].forEach(function(t,r){
+          var li=el("li",null,"<b>"+TH[r]+"</b><span title=\""+esc(t)+"\">"+esc(t)+"</span>");
+          li.onclick=function(){c.pts[k]=TH[r];refresh(c)};
+          ul.appendChild(li);
+        });
+        ln.appendChild(ul);sk.appendChild(ln);
+      });
+      body.appendChild(sk);n.appendChild(body);
+
+      box.appendChild(n);
+      refresh(c);
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>
