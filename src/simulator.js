@@ -2,7 +2,7 @@
   "use strict";
 
   var $=function(selector){return document.querySelector(selector)};
-  var cards=[],uid=0,SKILL_DATA,SKILL_MASTER,DEFAULT_NAMES,monsterData={};
+  var cards=[],uid=0,SKILL_DATA,SKILL_MASTER,SKILL_EFFECTS,DEFAULT_NAMES,monsterData={};
   var CATALOG_ORDER=[
     ["スライム","モーモン","プリズニャン","ホイミスライム","スライムナイト","キメラ","ねこまどう","リザードマン","バトルレックス","いたずらもぐら","ベビーサタン","ドラゴンキッズ","ドラキー","ブラウニー","キラーパンサー"],
     ["メタッピー","たけやりへい","ニードルマン","フォンデュ","エンタシスマン","さまようよろい","ゴーレム","デビルアーマー","おどるほうせき","マジカルハット","パペットマン","キラーマシン","やみしばり","たんすミミック","ミステリドール"]
@@ -40,6 +40,12 @@
     });
   }
 
+  function validSkillEffects(data){
+    return data&&Object.keys(data).length>0&&Object.keys(data).every(function(name){
+      return /^【.+】$/.test(name)&&typeof data[name]==="string"&&data[name].length>0;
+    });
+  }
+
   function validDefaultNames(data){
     return data&&CATALOG_ORDER.every(function(group){
       return group.every(function(name){
@@ -60,7 +66,7 @@
     CATALOG_ORDER.forEach(function(names,index){
       var group=$("#g"+(index+1));
       names.forEach(function(name){
-        if(!monsterData[name])throw new Error(name+" が SkillName.json にありません。");
+        if(!monsterData[name])throw new Error(name+" が Skill-name.json にありません。");
         var button=el("button",null,name);
         button.type="button";
         button.onclick=function(){add(name)};
@@ -192,13 +198,15 @@
         row.dataset.pt=String(entry.pt);
         var point=el("b",null,String(entry.pt));
         var effect=el("span",null,entry.effect);
-        effect.title=entry.effect;
+        var skillNames=entry.effect.match(/【[^】]+】/g)||[];
+        var descriptions=skillNames.map(function(name){return SKILL_EFFECTS[name]}).filter(Boolean);
+        effect.title=descriptions.length?descriptions.join("\n"):entry.effect;
         row.append(point,effect);
         row.onclick=function(){setLinePoints(card,index,entry.pt)};
         rows.appendChild(row);
       });
     }else{
-      var warning=el("li","data-missing",displaySkillName(line.name)+" のスキルデータが skills-master.json にありません");
+      var warning=el("li","data-missing",displaySkillName(line.name)+" のスキルデータが Skills-master.json にありません");
       warning.setAttribute("role","alert");
       rows.appendChild(warning);
     }
@@ -387,15 +395,18 @@
 
   async function initialize(){
     var loaded=await Promise.all([
-      loadJson("SkillName.json"),
-      loadJson("skills-master.json"),
+      loadJson("Skill-name.json"),
+      loadJson("Skills-master.json"),
+      loadJson("skill-effects.json"),
       loadJson("Monster-default-names.json")
     ]);
     SKILL_DATA=loaded[0];
     SKILL_MASTER=loaded[1];
-    DEFAULT_NAMES=loaded[2];
-    if(!validSkillData(SKILL_DATA))throw new Error("SkillName.json の形式が正しくありません。");
-    if(!validMasterData(SKILL_MASTER))throw new Error("skills-master.json の形式が正しくありません。");
+    SKILL_EFFECTS=loaded[2];
+    DEFAULT_NAMES=loaded[3];
+    if(!validSkillData(SKILL_DATA))throw new Error("Skill-name.json の形式が正しくありません。");
+    if(!validMasterData(SKILL_MASTER))throw new Error("Skills-master.json の形式が正しくありません。");
+    if(!validSkillEffects(SKILL_EFFECTS))throw new Error("skill-effects.json の形式が正しくありません。");
     if(!validDefaultNames(DEFAULT_NAMES))throw new Error("Monster-default-names.json の形式が正しくないか、モンスター名が不足しています。");
     buildMonsterMap();
     addCatalogButtons();
@@ -421,7 +432,7 @@
       message.appendChild(el("p",null,"このHTMLを直接開いているため、ブラウザーの制限でスキルデータを読み込めません。"));
       message.appendChild(el("p",null,"HTMLとJSONファイルを同じフォルダーに置いたまま、ローカルWebサーバー経由で開いてください。Windowsでは、そのフォルダーで「py -m http.server 8000」を実行し、表示されたサーバーのページからこのHTMLを開きます。"));
     }else{
-      message.appendChild(el("p",null,"スキルデータを読み込めませんでした。dataフォルダーに SkillName.json、skills-master.json、Monster-default-names.json があるか確認してください。"));
+      message.appendChild(el("p",null,"スキルデータを読み込めませんでした。dataフォルダーに Skill-name.json、Skills-master.json、skill-effects.json、Monster-default-names.json があるか確認してください。"));
       message.appendChild(el("p",null,"詳細: "+(error&&error.message?error.message:String(error))));
     }
     $("#cards").replaceChildren(message);
