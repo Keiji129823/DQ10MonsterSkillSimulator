@@ -2,7 +2,7 @@
   "use strict";
 
   var $=function(selector){return document.querySelector(selector)};
-  var cards=[],uid=0,SKILL_DATA,SKILL_MASTER,monsterData={};
+  var cards=[],uid=0,SKILL_DATA,SKILL_MASTER,DEFAULT_NAMES,monsterData={};
   var CATALOG_ORDER=[
     ["スライム","モーモン","プリズニャン","ホイミスライム","スライムナイト","キメラ","ねこまどう","リザードマン","バトルレックス","いたずらもぐら","ベビーサタン","ドラゴンキッズ","ドラキー","ブラウニー","キラーパンサー"],
     ["メタッピー","たけやりへい","ニードルマン","フォンデュ","エンタシスマン","さまようよろい","ゴーレム","デビルアーマー","おどるほうせき","マジカルハット","パペットマン","キラーマシン","やみしばり","たんすミミック","ミステリドール"]
@@ -16,7 +16,7 @@
   }
 
   async function loadJson(path){
-    var response=await fetch("./"+path);
+    var response=await fetch("./data/"+path);
     if(!response.ok)throw new Error(path+" の読み込みに失敗しました: "+response.status);
     return response.json();
   }
@@ -36,6 +36,14 @@
       var skill=data[name];
       return skill&&Number.isInteger(skill.max_pt)&&Array.isArray(skill.list)&&skill.list.every(function(entry){
         return Number.isInteger(entry.pt)&&typeof entry.effect==="string";
+      });
+    });
+  }
+
+  function validDefaultNames(data){
+    return data&&CATALOG_ORDER.every(function(group){
+      return group.every(function(name){
+        return typeof data[name]==="string"&&data[name].length>0;
       });
     });
   }
@@ -77,6 +85,10 @@
     }
     var name=base+suffix;
     return {name:name,data:SKILL_MASTER[name]||null};
+  }
+
+  function displaySkillName(name){
+    return name.replace(/（[^）]*）/g,"");
   }
 
   function extraSkills(name){
@@ -147,14 +159,14 @@
     var line=getLine(card,index);
     var node=el("div","line");
     node.dataset.lineIndex=String(index);
-    node.appendChild(el("h3",null,line.name+": "+card.pts[index]));
+    node.appendChild(el("h3",null,displaySkillName(line.name)+": "+card.pts[index]));
 
     var stepper=el("div","st");
     var input=el("input");
     input.type="number";
     input.min="0";
     input.max=line.data?String(line.data.max_pt):"0";
-    input.setAttribute("aria-label",line.name+"のポイント");
+    input.setAttribute("aria-label",displaySkillName(line.name)+"のポイント");
     input.disabled=!line.data;
     input.oninput=function(){setLinePoints(card,index,input.value)};
     input.onkeydown=function(event){
@@ -186,7 +198,7 @@
         rows.appendChild(row);
       });
     }else{
-      var warning=el("li","data-missing",line.name+" のスキルデータが skills-master.json にありません");
+      var warning=el("li","data-missing",displaySkillName(line.name)+" のスキルデータが skills-master.json にありません");
       warning.setAttribute("role","alert");
       rows.appendChild(warning);
     }
@@ -206,13 +218,12 @@
     if(!node)return;
     var extra=bonus(card),base=baseSp(card.level),total=base+extra.b1+extra.b2;
     var used=sum(card.pts);
-    node.querySelector(".ttl").innerHTML=esc(card.title)+" Lv"+card.level+
-      (card.trans?" <small>+ "+card.trans+"</small>":"");
+    node.querySelector(".ttl").textContent=card.title+" Lv"+card.level;
     node.querySelector(".sp").textContent=(total-used)+" / "+total;
     node.querySelector(".sp").style.color=(total-used)<0?"var(--c-notice)":"";
     node.querySelectorAll(".line[data-line-index]").forEach(function(lineNode){
       var index=Number(lineNode.dataset.lineIndex),line=getLine(card,index);
-      lineNode.querySelector("h3").textContent=line.name+": "+card.pts[index];
+      lineNode.querySelector("h3").textContent=displaySkillName(line.name)+": "+card.pts[index];
       var input=lineNode.querySelector("input");
       input.value=card.pts[index];
       input.max=line.data?line.data.max_pt:0;
@@ -226,12 +237,6 @@
       btoa(unescape(encodeURIComponent(cards.map(function(entry){
         return entry.name+entry.level+"."+entry.pts.join("-");
       }).join("|")))).slice(0,24);
-  }
-
-  function esc(text){
-    return text.replace(/[&<>"]/g,function(character){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[character];
-    });
   }
 
   function render(){
@@ -262,7 +267,7 @@
         select.appendChild(new Option("",""));
         extraSkills(card.name).filter(function(skill){return card.trans>=skill.trans}).forEach(function(skill){
           var option=lineTier(skill.name,card.trans,skill.kind);
-          select.appendChild(new Option(option.name,skill.name));
+          select.appendChild(new Option(displaySkillName(option.name),skill.name));
         });
         select.value=card.extra[slot];
         select.onchange=function(){
@@ -287,7 +292,7 @@
       nameLabel.appendChild(nameInput);
       header.appendChild(nameLabel);
       [
-        ["fold",card.fold?"▼":"⤒","たたむ/ひろげる",function(){card.fold=!card.fold;render()}],
+        ["fold",card.fold?"▶":"⤒",card.fold?"ひろげる":"たたむ",function(){card.fold=!card.fold;render()}],
         ["dn","▼","下へ",function(){move(index,1)}],
         ["up","▲","上へ",function(){move(index,-1)}],
         ["del","✖","削除",function(){cards.splice(index,1);render()}]
@@ -362,8 +367,8 @@
 
   function add(name){
     cards.push({
-      id:++uid,name:name,title:name,level:50,trans:15,nat:10,
-      extra:["",""],pts:[0,0,0,0,0],fold:false,
+      id:++uid,name:name,title:DEFAULT_NAMES[name],level:50,trans:15,nat:10,
+      extra:[monsterData[name].skills[2],monsterData[name].skills[3]],pts:[0,0,0,0,0],fold:false,
       lines:monsterData[name].skills.slice(0,2).concat(monsterData[name].skills[2])
     });
     render();
@@ -381,11 +386,17 @@
   }
 
   async function initialize(){
-    var loaded=await Promise.all([loadJson("SkillName.json"),loadJson("skills-master.json")]);
+    var loaded=await Promise.all([
+      loadJson("SkillName.json"),
+      loadJson("skills-master.json"),
+      loadJson("Monster-default-names.json")
+    ]);
     SKILL_DATA=loaded[0];
     SKILL_MASTER=loaded[1];
+    DEFAULT_NAMES=loaded[2];
     if(!validSkillData(SKILL_DATA))throw new Error("SkillName.json の形式が正しくありません。");
     if(!validMasterData(SKILL_MASTER))throw new Error("skills-master.json の形式が正しくありません。");
+    if(!validDefaultNames(DEFAULT_NAMES))throw new Error("Monster-default-names.json の形式が正しくないか、モンスター名が不足しています。");
     buildMonsterMap();
     addCatalogButtons();
 
@@ -410,7 +421,7 @@
       message.appendChild(el("p",null,"このHTMLを直接開いているため、ブラウザーの制限でスキルデータを読み込めません。"));
       message.appendChild(el("p",null,"HTMLとJSONファイルを同じフォルダーに置いたまま、ローカルWebサーバー経由で開いてください。Windowsでは、そのフォルダーで「py -m http.server 8000」を実行し、表示されたサーバーのページからこのHTMLを開きます。"));
     }else{
-      message.appendChild(el("p",null,"スキルデータを読み込めませんでした。SkillName.json と skills-master.json がHTMLと同じフォルダーにあるか確認してください。"));
+      message.appendChild(el("p",null,"スキルデータを読み込めませんでした。dataフォルダーに SkillName.json、skills-master.json、Monster-default-names.json があるか確認してください。"));
       message.appendChild(el("p",null,"詳細: "+(error&&error.message?error.message:String(error))));
     }
     $("#cards").replaceChildren(message);

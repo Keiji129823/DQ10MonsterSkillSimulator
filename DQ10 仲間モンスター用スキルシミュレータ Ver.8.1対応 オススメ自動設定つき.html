@@ -44,7 +44,7 @@ h1{margin:0;font-size:19px;line-height:1.3;color:var(--c-title)}
 .ctl{display:flex;flex-direction:column;gap:var(--sp-xs)}
 .ctl button{width:112px;height:22px;text-align:left;white-space:nowrap;font-size:12px}
 .grp{display:grid;grid-template-columns:repeat(5,var(--pal-w));gap:var(--sp-xs)}
-.grp button{height:22px;text-align:left;padding:0 4px;overflow:hidden;white-space:nowrap;font-size:12px}
+.grp button{height:22px;text-align:left;padding:0 4px;overflow:hidden;white-space:nowrap;font-size:11px}
 
 /* layout */
 .wrap{display:flex;gap:var(--sp-md);padding:var(--sp-md);align-items:flex-start}
@@ -64,12 +64,12 @@ aside{width:var(--side);flex:none;align-self:stretch}
 /* card */
 .card-h{display:flex;align-items:center;gap:8px;padding:4px 8px;flex-wrap:wrap}
 .card-h .ttl{font-size:18px;font-weight:700;margin-right:auto;white-space:nowrap}
-.card-h .ttl small{font-size:13px;font-weight:400}
 .card-h label{white-space:nowrap;font-size:13px}
 .card-h select,.card-h input{height:24px;font-size:13px}
 .card-h select{max-width:110px}
 .card-h .nm{width:110px;padding:0 4px;background:var(--c-bg)}
 .ib{width:24px;height:24px;padding:0;text-align:center;line-height:1;font-size:12px}
+.card-h .ib:last-child{margin-left:auto}
 .body{display:flex;padding:0 8px 4px;gap:0}
 .left{width:var(--left-w);flex:none;padding:2px 8px 4px 0;border-right:1px solid var(--c-hair);text-align:center;font-size:13px;line-height:1.45}
 .left select{height:24px;font-size:13px}
@@ -88,12 +88,12 @@ aside{width:var(--side);flex:none;align-self:stretch}
 .line input{width:56px;height:24px;text-align:right;font-size:13px}
 .line .rs{width:28px;height:24px;padding:0;font-size:13px}
 .rows{list-style:none;margin:0;padding:0}
-.rows li{display:flex;gap:6px;height:21px;line-height:21px;color:var(--c-muted);cursor:pointer;white-space:nowrap;overflow:hidden;font-size:12.5px}
-.rows li span{overflow:hidden;text-overflow:ellipsis}
+.rows li{display:flex;align-items:flex-start;gap:6px;min-height:21px;line-height:1.35;color:var(--c-muted);cursor:pointer;font-size:11px}
+.rows li span{min-width:0}
 .rows li:hover{background:var(--c-btn)}
 .rows li b{width:20px;text-align:right;font-weight:400;flex:none}
 .rows li.on{color:var(--c-text);font-weight:700}
-.rows li.data-missing{height:auto;line-height:1.4;white-space:normal;color:var(--c-notice);cursor:default}
+.rows li.data-missing{line-height:1.4;color:var(--c-notice);cursor:default}
 .rows li.on b{color:var(--c-active)}
 .card.fold .rows,.card.fold .rec{display:none}
 .card.fold .line{padding-bottom:0}
@@ -143,7 +143,7 @@ aside{width:var(--side);flex:none;align-self:stretch}
   <div class="panel bulk"><label for="bl">レベル一括設定</label><select id="bl"></select><button id="bs" type="button">設定</button></div>
   <div class="desc">
     <ul>
-      <li>スキル名は SkillName.json、効果と必要ポイントは skills-master.json を参照しています。両ファイルをHTMLと同じフォルダーに置き、ローカルWebサーバー経由でページを開いてください（HTMLを直接開くと読み込めません）。</li>
+      <li>スキル名は data/SkillName.json、効果と必要ポイントは data/skills-master.json、モンスター名の初期値は data/Monster-default-names.json を参照しています。ローカルWebサーバー経由でページを開いてください（HTMLを直接開くと読み込めません）。</li>
       <li>使い方:
         <ul>
           <li>ページ上部のモンスター名のボタンをクリックすると、仲間モンスターの欄がひとつ増えます。</li>
@@ -160,7 +160,7 @@ aside{width:var(--side);flex:none;align-self:stretch}
 <aside><div class="ad" aria-label="広告枠">広告枠 160×600</div></aside>
 </div>
 
-<script src="./simulator.js"></script>
+<script src="./src/simulator.js"></script>
 
 </body>
 </html>
