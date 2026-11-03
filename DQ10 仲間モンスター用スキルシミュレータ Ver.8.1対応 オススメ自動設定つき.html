@@ -75,7 +75,9 @@ aside{width:var(--side);flex:none;align-self:stretch}
 .left select{height:24px;font-size:13px}
 .left .sp{font-size:18px;font-weight:700}
 .left input[type=number]{width:52px;height:24px;text-align:right;font-size:13px}
-.rec{display:block;width:100%;height:38px;margin-top:12px;border:0;border-radius:6px;background:linear-gradient(#ff9a1f,#ff6a00);color:#fff;font-weight:700;font-size:15px;box-shadow:0 2px 0 #b84800;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.rec-label{margin-top:10px;font-weight:700}
+.rec-list{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.rec{display:block;width:100%;min-height:32px;padding:4px;border:0;border-radius:6px;background:linear-gradient(#ff9a1f,#ff6a00);color:#fff;font-weight:700;font-size:12px;line-height:1.35;white-space:normal;box-shadow:0 2px 0 #b84800;text-shadow:0 1px 0 rgba(0,0,0,.25)}
 .rec:hover{filter:brightness(1.08)}
 .rec:active{transform:translateY(1px);box-shadow:0 1px 0 #b84800}
 .skills{display:flex;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0}
@@ -96,6 +98,7 @@ aside{width:var(--side);flex:none;align-self:stretch}
 .rows li.data-missing{line-height:1.4;color:var(--c-notice);cursor:default}
 .rows li.on b{color:var(--c-active)}
 .card.fold .rows,.card.fold .rec{display:none}
+.card.fold .rec-label{display:none}
 .card.fold .line{padding-bottom:0}
 
 /* description */
@@ -124,7 +127,7 @@ aside{width:var(--side);flex:none;align-self:stretch}
 <header>
   <div class="h-top">
     <h1>DQ10 仲間モンスター用スキルシミュレータ Ver.8.1対応 オススメ自動設定つき</h1>
-    <div class="url"><label for="u">保存用URL:</label><input id="u" readonly><button type="button">保存用URLをツイート</button></div>
+    <div class="url"><label for="u">保存用URL:</label><input id="u" readonly><button id="copy-url" type="button">コピー</button></div>
   </div>
   <div class="nav">
     <div class="ctl"><button id="foldAll" type="button">▲すべてたたむ</button><button id="openAll" type="button">▼すべてひろげる</button></div>
@@ -142,19 +145,21 @@ aside{width:var(--side);flex:none;align-self:stretch}
   </div>
   <div class="panel bulk"><label for="bl">レベル一括設定</label><select id="bl"></select><button id="bs" type="button">設定</button></div>
   <div class="desc">
+    <p>スクウェア・エニックス『<a href="https://www.dqx.jp/" target="_blank" rel="noopener noreferrer">ドラゴンクエストX</a>』の仲間モンスターのスキルポイント配分を検討するシミュレータです。</p>
     <ul>
-      <li>スキル名は data/Skill-name.json、効果と必要ポイントは data/Skills-master.json、特技の説明は data/skill-effects.json、モンスター名の初期値は data/Monster-default-names.json を参照しています。ローカルWebサーバー経由でページを開いてください（HTMLを直接開くと読み込めません）。</li>
       <li>使い方:
         <ul>
           <li>ページ上部のモンスター名のボタンをクリックすると、仲間モンスターの欄がひとつ増えます。</li>
+          <li>画面上部の「コピー」ボタンで保存用URLをコピーできます。URLを開くと、コピー時の編成とスキル配分を再現できます。</li>
           <li>各欄右上の×で削除、▼と▲で並べ替え、「たたむ」で簡易表示になります。</li>
+          <li>左側のオススメ設定ボタンで、登録された配分を自動で入力します。適用時はLv50・なつき度300・転生15回に設定されます。</li>
           <li>スキル一覧の項目をクリックすると必要なポイントが自動入力されます。↑↓キーで±1、PageUp/PageDownキーで±10、直接入力も可能です。</li>
           <li>追加スキルは必要な転生回数に達すると選択でき、スキル欄の4列目・5列目に表示されます。武器の極意は転生7回、固有スキルは転生8回から選べます。</li>
           <li>固有スキル1・2は転生10回でⅡ、14回でⅢ、3つ目の武器スキルは転生11回でⅡ、15回でⅢに切り替わります。追加の固有スキルは13回、追加の武器の極意は12回でⅡになります（武器の極意はⅢになりません）。</li>
-          <li>マスターに該当ランクのデータがない場合は不足を表示し、そのスキルへのポイント配分を無効にします。</li>
         </ul>
       </li>
     </ul>
+    <p>参考にさせていただいたサイト：<a href="https://dq10.cpro.jp/monster" target="_blank" rel="noopener noreferrer">仲間モンスターのスキルシミュレータ</a></p>
   </div>
 </main>
 <aside><div class="ad" aria-label="広告枠">広告枠 160×600</div></aside>
