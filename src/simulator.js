@@ -132,7 +132,7 @@
       cards=restored;
     }catch(error){
       console.error("共有URLを読み込めませんでした。",error);
-      window.alert("共有URLの配分を読み込めませんでした。URLが正しいか確認してください。");
+      showToast("共有URLの配分を読み込めませんでした。URLが正しいか確認してください。");
     }
   }
 
@@ -223,6 +223,35 @@
       .toLocaleLowerCase("ja");
   }
 
+  function showToast(message){
+    var toast=$("#toast");
+    if(!toast)return;
+    toast.textContent=message;
+    toast.classList.add("show");
+    window.clearTimeout(showToast.timer);
+    showToast.timer=window.setTimeout(function(){toast.classList.remove("show")},2200);
+  }
+
+  function showSkillTooltip(node,text){
+    var tooltip=$("#skill-tooltip");
+    if(!tooltip||!text)return;
+    tooltip.textContent=text;
+    tooltip.classList.add("show");
+    tooltip.setAttribute("aria-hidden","false");
+    var rect=node.getBoundingClientRect();
+    var left=rect.left + rect.width/2;
+    var top=rect.top - 8;
+    tooltip.style.left=Math.min(window.innerWidth - 300,Math.max(12,left - 140))+"px";
+    tooltip.style.top=Math.max(10,top - tooltip.offsetHeight - 8)+"px";
+  }
+
+  function hideSkillTooltip(){
+    var tooltip=$("#skill-tooltip");
+    if(!tooltip)return;
+    tooltip.classList.remove("show");
+    tooltip.setAttribute("aria-hidden","true");
+  }
+
   function recommendedExtra(card,name){
     var alternatives=name.split(/\s*or\s*/i).map(comparableSkillName);
     var match=extraSkills(card.name).find(function(skill){
@@ -297,7 +326,16 @@
         var effect=el("span",null,entry.effect);
         var skillNames=entry.effect.match(/【[^】]+】/g)||[];
         var descriptions=skillNames.map(function(name){return SKILL_EFFECTS[name]}).filter(Boolean);
-        effect.title=descriptions.length?descriptions.join("\n"):entry.effect;
+        var tooltipText=descriptions.length?descriptions.join("\n"):entry.effect;
+        effect.title="";
+        effect.dataset.tooltip=tooltipText;
+        effect.tabIndex=0;
+        ["mouseenter","focus"].forEach(function(eventName){
+          effect.addEventListener(eventName,function(){showSkillTooltip(effect,tooltipText);});
+        });
+        ["mouseleave","blur"].forEach(function(eventName){
+          effect.addEventListener(eventName,hideSkillTooltip);
+        });
         row.append(point,effect);
         row.onclick=function(){setLinePoints(card,index,entry.pt)};
         rows.appendChild(row);
@@ -346,7 +384,7 @@
   async function copyUrl(){
     var input=$("#u"),button=$("#copy-url");
     if(!input.value){
-      window.alert("コピーする保存用URLがありません。");
+      showToast("コピーする保存用URLがありません。");
       return;
     }
     var copied=false;
@@ -369,11 +407,12 @@
     }
     if(copied){
       button.textContent="コピーしました";
+      showToast("保存用URLをコピーしました。");
       window.setTimeout(function(){button.textContent="コピー"},1500);
     }else{
       input.focus();
       input.select();
-      window.alert("保存用URLをコピーできませんでした。URLを選択したので、手動でコピーしてください。");
+      showToast("保存用URLをコピーできませんでした。URLを選択したので、手動でコピーしてください。");
     }
   }
 
@@ -495,7 +534,7 @@
               applyRecommendedBuild(card,title,build);
             }catch(error){
               console.error("オススメ設定を適用できませんでした。",error);
-              window.alert("オススメ設定を適用できませんでした。\n"+error.message);
+              showToast("オススメ設定を適用できませんでした。\n"+error.message);
             }
           };
           recommendationButtons.appendChild(recommendButton);
