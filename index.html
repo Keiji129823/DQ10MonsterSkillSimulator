@@ -15,7 +15,7 @@
   --c-guide:#008000; --c-notice:#ff4040; --c-panel:#7a8a9a; --c-rule:#e8c8c8;
   --c-btn:#efeeea; --c-btn-b:#aaa; --c-hair:#c9c9c9; --c-active:#b00020;
   --fs:14px; --sp-xs:2px; --sp-sm:4px; --sp-md:10px; --sp-lg:12px;
-  --pal-w:100px; --skill-w:210px; --left-w:136px;
+  --side:176px; --pal-w:100px; --skill-w:210px; --left-w:136px;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
@@ -54,6 +54,7 @@ h1{margin:0;font-size:19px;line-height:1.3;color:var(--c-title)}
 /* layout */
 .wrap{display:flex;gap:var(--sp-md);padding:var(--sp-md);align-items:flex-start}
 main{flex:1;min-width:0}
+aside{width:var(--side);min-height:600px;flex:none;align-self:stretch;position:sticky;top:12px}
 .panel{border:2px solid var(--c-panel);border-radius:5px;margin-bottom:var(--sp-sm);background:var(--c-bg)}
 
 /* empty / bulk */
@@ -120,6 +121,7 @@ footer{padding:var(--sp-md);border-top:1px solid var(--c-hair);text-align:center
   .h-top{flex-wrap:wrap}
   .url{flex-basis:100%}
   .wrap{flex-direction:column}
+  aside{display:none}
   .body{flex-direction:column}
   .left{width:100%;border-right:0;border-bottom:1px solid var(--c-hair);padding-bottom:6px}
   .skills{flex-wrap:wrap;overflow-x:visible}
@@ -174,6 +176,7 @@ footer{padding:var(--sp-md);border-top:1px solid var(--c-hair);text-align:center
     <p>参考にさせていただいたサイト：<a href="https://dq10.cpro.jp/monster" target="_blank" rel="noopener noreferrer">仲間モンスターのスキルシミュレータ</a></p>
   </div>
 </main>
+<aside aria-hidden="true"></aside>
 </div>
 <footer><a href="./privacy-policy.html">プライバシーポリシー</a></footer>
 <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
