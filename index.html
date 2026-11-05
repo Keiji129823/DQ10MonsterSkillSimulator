@@ -15,7 +15,7 @@
   --c-guide:#008000; --c-notice:#ff4040; --c-panel:#7a8a9a; --c-rule:#e8c8c8;
   --c-btn:#efeeea; --c-btn-b:#aaa; --c-hair:#c9c9c9; --c-active:#b00020;
   --fs:14px; --sp-xs:2px; --sp-sm:4px; --sp-md:10px; --sp-lg:12px;
-  --side:176px; --pal-w:100px; --skill-w:210px; --left-w:136px;
+  --pal-w:100px; --skill-w:210px; --left-w:136px;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
@@ -54,8 +54,6 @@ h1{margin:0;font-size:19px;line-height:1.3;color:var(--c-title)}
 /* layout */
 .wrap{display:flex;gap:var(--sp-md);padding:var(--sp-md);align-items:flex-start}
 main{flex:1;min-width:0}
-aside{width:var(--side);flex:none;align-self:stretch}
-.ad{position:sticky;top:12px;width:160px;height:600px;margin:0 auto;border:1px dashed var(--c-hair);display:flex;align-items:center;justify-content:center;color:var(--c-muted);font-size:12px}
 .panel{border:2px solid var(--c-panel);border-radius:5px;margin-bottom:var(--sp-sm);background:var(--c-bg)}
 
 /* empty / bulk */
@@ -115,13 +113,13 @@ aside{width:var(--side);flex:none;align-self:stretch}
 .toast.show{opacity:1;transform:translateY(0)}
 .skill-tooltip{position:fixed;left:0;top:0;max-width:280px;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:rgba(30,34,42,.96);color:#fff;box-shadow:0 12px 24px rgba(0,0,0,.2);font-size:12px;line-height:1.5;white-space:pre-line;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s ease,transform .15s ease;z-index:2001}
 .skill-tooltip.show{opacity:1;transform:translateY(0)}
+footer{padding:var(--sp-md);border-top:1px solid var(--c-hair);text-align:center;font-size:12px}
 
 @media (max-width:1000px){
   :root{--fs:14px}
   .h-top{flex-wrap:wrap}
   .url{flex-basis:100%}
   .wrap{flex-direction:column}
-  aside{display:none}
   .body{flex-direction:column}
   .left{width:100%;border-right:0;border-bottom:1px solid var(--c-hair);padding-bottom:6px}
   .skills{flex-wrap:wrap;overflow-x:visible}
@@ -176,8 +174,8 @@ aside{width:var(--side);flex:none;align-self:stretch}
     <p>参考にさせていただいたサイト：<a href="https://dq10.cpro.jp/monster" target="_blank" rel="noopener noreferrer">仲間モンスターのスキルシミュレータ</a></p>
   </div>
 </main>
-<aside><div class="ad" aria-label="広告枠">広告枠 160×600</div></aside>
 </div>
+<footer><a href="./privacy-policy.html">プライバシーポリシー</a></footer>
 <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
 <div id="skill-tooltip" class="skill-tooltip" role="tooltip" aria-hidden="true"></div>
 
